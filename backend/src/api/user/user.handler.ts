@@ -1,22 +1,43 @@
 import ErrorResponse from '../../util/createError';
 import Hash from '../../util/hash';
 import {
+  CreateUserInput,
   LoginUserInput,
   User,
-  UserWithPassword,
   UserWithoutAddress,
 } from './user.model';
 import UserService from './user.service';
 
 class UserHandler {
-  static create = async (user: UserWithPassword): Promise<User> => {
+  static create = async (user: CreateUserInput): Promise<User> => {
     const { hashedPassword, salt } = await Hash.calculateHash(user.password);
 
     const newUser = await UserService.create({
-      ...user,
-      salt,
+      name: user.name,
+      email: user.email,
       password: hashedPassword,
+      salt,
+      userTypeID: user.userTypeID,
+      isVerified: true,
+      address: user.address,
     });
+
+    // switch (user.userTypeID) {
+    //   case USER_TYPE.BARBER_USER:
+    //     console.log('asd');
+    //     break;
+    //   case USER_TYPE.CUSTOMER_USER:
+    //     console.log('asd');
+    //     break;
+    //   case USER_TYPE.SHOP_USER:
+    //     ShopHandler.create({
+    //       shopName: user.name,
+    //       userID: newUser.userID,
+    //     });
+    //     break;
+    //   default:
+    //     break;
+    // }
 
     return newUser as User;
   };

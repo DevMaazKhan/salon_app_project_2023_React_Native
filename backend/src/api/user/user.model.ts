@@ -19,6 +19,7 @@ export const User = zod.object({
 });
 
 export const CreateUserInput = zod.object({
+  name: zod.string(),
   email: zod.string(),
   password: zod.string(),
   userTypeID: zod.number(),
@@ -38,7 +39,7 @@ export const LoginUserInput = zod.object({
 
 type UserType = zod.infer<typeof User>;
 export type User = Omit<UserType, 'password'>;
-export type CreateUserInput = Omit<UserType, 'salt' | 'isVerified'>;
+export type CreateUserInput = zod.infer<typeof CreateUserInput>;
 export type UserWithPassword = UserType;
 export type UserWithoutAddress = Omit<User, 'address' | 'password'>;
 export type LoginUserInput = zod.infer<typeof LoginUserInput>;

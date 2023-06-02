@@ -9,5 +9,11 @@ export const Barber = zod.object({
   userID: zod.number(),
 });
 
+export const CreateBarberInput = zod.object({
+  barberName: zod.string(),
+  totalExperienceInYear: zod.number(),
+});
+
 export type Barber = zod.infer<typeof Barber>;
+export type CreateBarberInput = zod.infer<typeof CreateBarberInput>;
 export const Barbers = db.barber;

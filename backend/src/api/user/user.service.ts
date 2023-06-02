@@ -1,14 +1,38 @@
-import { UserWithPassword, Users } from './user.model';
+import { USER_TYPE } from '../../config/setup';
+import { CreateBarberInput } from '../barber/barber.model';
+import { CreateCustomerInput } from '../customer/customer.model';
+import { CreateShopInput } from '../shop/shop.model';
+import { CreateUserInput, UserWithPassword, Users } from './user.model';
 
 class UserService {
-  static create = async (user: UserWithPassword) =>
-    Users.create({
+  static create = async (user: UserWithPassword & CreateUserInput) => {
+    const barber: CreateBarberInput | undefined =
+      user.userTypeID === USER_TYPE.BARBER_USER
+        ? {
+            barberName: user.name,
+            totalExperienceInYear: 1,
+          }
+        : undefined;
+    const shop: CreateShopInput | undefined =
+      user.userTypeID === USER_TYPE.SHOP_USER
+        ? {
+            shopName: user.name,
+          }
+        : undefined;
+    const customer: CreateCustomerInput | undefined =
+      user.userTypeID === USER_TYPE.CUSTOMER_USER
+        ? {
+            customerName: user.name,
+          }
+        : undefined;
+
+    return Users.create({
       data: {
         isVerified: user.isVerified,
         email: user.email,
         password: user.password,
         salt: user.salt,
-        userTypeID: 1,
+        userTypeID: user.userTypeID,
         address: {
           create: {
             addressLine1: user.address.addressLine1,
@@ -24,11 +48,24 @@ class UserService {
             },
           },
         },
+        barber: {
+          create: barber,
+        },
+        customer: {
+          create: customer,
+        },
+        shop: {
+          create: shop,
+        },
       },
       include: {
         address: true,
+        barber: user.userTypeID === USER_TYPE.BARBER_USER,
+        customer: user.userTypeID === USER_TYPE.CUSTOMER_USER,
+        shop: user.userTypeID === USER_TYPE.SHOP_USER,
       },
     });
+  };
 
   static getUserByEmail = async (email: string) =>
     Users.findFirst({

@@ -8,5 +8,10 @@ export const Shop = zod.object({
   userID: zod.number(),
 });
 
+export const CreateShopInput = zod.object({
+  shopName: zod.string(),
+});
+
 export type Shop = zod.infer<typeof Shop>;
+export type CreateShopInput = zod.infer<typeof CreateShopInput>;
 export const Shops = db.shop;

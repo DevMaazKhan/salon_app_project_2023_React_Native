@@ -1,5 +1,4 @@
 import { type Request, type Response, type NextFunction } from 'express';
-import userHandler from './user.handler';
 import {
   CreateUserInput,
   LoginUserInput,
@@ -12,6 +11,7 @@ import createSuccessResponse, {
 import ErrorResponse from '../../util/createError';
 import Token from '../../util/jwt';
 import config from '../../util/config';
+import userActions from './user.handler';
 
 class UserController {
   static create = async (
@@ -22,11 +22,11 @@ class UserController {
     try {
       const user = CreateUserInput.parse(req.body ?? {});
 
-      const newUser = await userHandler.create({
+      const newUser = await userActions.create({
         email: user.email,
         password: user.password,
-        isVerified: true,
-        salt: '',
+        userTypeID: user.userTypeID,
+        name: user.name,
         address: {
           addressLine1: user.address.addressLine1,
           addressLine2: user.address.addressLine2,
@@ -54,7 +54,7 @@ class UserController {
     try {
       const user = LoginUserInput.parse(req.body ?? {});
 
-      const loggedInUser = await userHandler.login(user);
+      const loggedInUser = await userActions.login(user);
 
       if (
         !loggedInUser ||

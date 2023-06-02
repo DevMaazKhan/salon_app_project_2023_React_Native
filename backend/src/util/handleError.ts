@@ -11,6 +11,8 @@ function handleError(
   res: Response,
   next: NextFunction
 ) {
+  logger.error(JSON.stringify(error));
+
   let requiredFieldsError = '';
   let numberTypeFieldsError = '';
   let tooSmallFieldError = '';
@@ -89,25 +91,22 @@ function handleError(
     }
 
     if (error.code === 'P2025') {
-      const startIndex = `${(error.meta?.cause as string).indexOf("'")}`;
-      const endIndex = `${(error.meta?.cause as string).indexOf(
-        "'",
-        +startIndex + 1
-      )}`;
-      const recordName = `${(error.meta?.cause as string).slice(
-        +startIndex + 1,
-        +endIndex
-      )}`;
+      const cause: string = (error.meta?.cause as string) || '';
+      if (cause.startsWith('No')) {
+        const startIndex = `${cause.indexOf("'")}`;
+        const endIndex = `${cause.indexOf("'", +startIndex + 1)}`;
+        const recordName = `${cause.slice(+startIndex + 1, +endIndex)}`;
 
-      recordNotFound = `${recordName} with the given ID is not defined`;
+        recordNotFound = `${recordName} with the given ID is not defined`;
+      } else if (cause.startsWith('Record')) {
+        recordNotFound = `${cause}`;
+      }
     }
   }
 
   if (error instanceof ErrorResponse) {
     customError = error.message;
   }
-
-  logger.error(JSON.stringify(error));
 
   const errors = [];
 
@@ -130,7 +129,7 @@ function handleError(
     errors.push(customError);
   }
 
-  res.status(error.statusCode || statusCode).json({
+  res.status(error.status || statusCode).json({
     message: `${errors.join(' | ')}`,
     error,
   });
