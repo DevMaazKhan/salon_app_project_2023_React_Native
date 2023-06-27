@@ -24,10 +24,10 @@ class ServiceHandler {
       const newService = await ServiceService.create({
         serviceDiscountPrice: validatedService.serviceDiscountPrice,
         serviceDurationInMinutes: validatedService.serviceDurationInMinutes,
-        serviceImageUrl: validatedService.serviceImageUrl,
         serviceName: validatedService.serviceName,
         servicePrice: validatedService.servicePrice,
         shopID: validatedService.shopID,
+        categoryID: +validatedService.categoryID,
       });
 
       return newService;

@@ -8,6 +8,7 @@ import { login } from "../../api/user.api";
 import handleError from "../../utils/handleError";
 import useUserContext from "../../hooks/useUserContext";
 import getResponseData from "../../utils/getResponseData";
+import { useNavigate } from "react-router-dom";
 
 interface UserLoginResponse {
   email: string;
@@ -18,6 +19,7 @@ interface UserLoginResponse {
 
 function LoginScreen() {
   const { setUser } = useUserContext();
+  const navigate = useNavigate();
 
   const { isLoading, mutate: loginFunc } = useMutation(login, {
     onSuccess: (data) => {
@@ -29,6 +31,8 @@ function LoginScreen() {
         isVerified: resData.isVerified,
         userTypeID: resData.userTypeID,
       });
+
+      navigate("/home");
     },
     onError: (error) => {
       handleError(error);

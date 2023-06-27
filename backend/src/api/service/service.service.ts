@@ -20,9 +20,12 @@ class ServiceService {
         hasDiscount: service.serviceDiscountPrice > 0,
         serviceDiscountPrice: service.serviceDiscountPrice,
         serviceDurationInMinutes: service.serviceDurationInMinutes,
-        serviceImageUrl: service.serviceImageUrl,
+        serviceImageUrl: '',
         serviceName: service.serviceName,
         servicePrice: service.servicePrice,
+        category: {
+          connect: { categoryID: service.categoryID },
+        },
         shop: {
           connect: { userID: service.shopID },
         },
@@ -36,7 +39,7 @@ class ServiceService {
   ): Promise<Service> => {
     return Services.update({
       data: {
-        hasDiscount: service.serviceDiscountPrice > 0,
+        hasDiscount: (service.serviceDiscountPrice || 0) > 0,
         serviceDiscountPrice: service.serviceDiscountPrice,
         serviceDurationInMinutes: service.serviceDurationInMinutes,
         serviceImageUrl: service.serviceImageUrl,

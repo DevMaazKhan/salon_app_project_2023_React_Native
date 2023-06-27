@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import fs from 'fs';
+import { join } from 'path';
+import { copyFile, rm } from 'fs/promises';
 import createSuccessResponse, {
   SuccessResponse,
 } from '../../util/createResponse';
@@ -10,10 +11,12 @@ import {
   Service,
   UpdateServiceInput,
   UpdateServiceInputParams,
+  UploadImageInput,
 } from './service.model';
 import ErrorResponse from '../../util/createError';
 import ServiceHandler from './service.handler';
-import config from '../../util/config';
+import CategoryHandler from '../category/category.handler';
+import ShopHandler from '../shop/shop.handler';
 
 class ServiceController {
   static getAll = async (
@@ -36,12 +39,8 @@ class ServiceController {
     next: NextFunction
   ) => {
     try {
-      await GetByIDInput.parseAsync({
-        serviceID: +req.params.serviceID,
-      });
-
       const { serviceID } = req.params;
-      const service = await ServiceHandler.getByID(serviceID);
+      const service = await ServiceHandler.getByID(+serviceID);
 
       if (service) {
         res.send(createSuccessResponse(service, 'Service found successfully'));
@@ -56,33 +55,36 @@ class ServiceController {
   };
 
   static create = async (
-    req: Request<any, SuccessResponse<Service>, CreateServiceInput>,
+    req: Request<{}, SuccessResponse<Service>, CreateServiceInput>,
     res: Response<SuccessResponse<Service>>,
     next: NextFunction
   ) => {
     try {
-      fs.write(
-        config.APP_HOME + '/images/out.png',
-        req.body.image,
-        'base64',
-        function (err) {
-          if (err) console.log(err);
+      const service = req.body;
+
+      if (service.shopID > 0) {
+        const shop = await ShopHandler.getByID(+service.shopID);
+
+        if (!shop) {
+          return next(new ErrorResponse(`Shop does not exists`, 400));
         }
-      );
-      if (!req.file) {
-        return next(new ErrorResponse(`Service Image is required`, 400));
       }
 
-      console.log(req.file);
+      if (service.categoryID > 0) {
+        const category = await CategoryHandler.getByID(+service.categoryID);
 
-      const service = req.body;
+        if (!category) {
+          return next(new ErrorResponse(`Category does not exists`, 400));
+        }
+      }
+
       const newService = await ServiceHandler.create({
         serviceDiscountPrice: service.serviceDiscountPrice,
         serviceDurationInMinutes: service.serviceDurationInMinutes,
-        serviceImageUrl: service.serviceImageUrl,
         serviceName: service.serviceName,
         servicePrice: service.servicePrice,
         shopID: service.shopID,
+        categoryID: +service.categoryID,
       });
 
       if (!newService) {
@@ -95,8 +97,6 @@ class ServiceController {
         createSuccessResponse(newService, 'Service created successfully')
       );
     } catch (error) {
-      console.log(error);
-
       next(error);
     }
 
@@ -113,10 +113,6 @@ class ServiceController {
     next: NextFunction
   ) => {
     try {
-      await UpdateServiceInputParams.parseAsync({
-        serviceID: +req.params.serviceID,
-      });
-
       const service = req.body;
       const updatedService = await ServiceHandler.update(
         {
@@ -126,7 +122,7 @@ class ServiceController {
           serviceName: service.serviceName,
           servicePrice: service.servicePrice,
         },
-        req.params.serviceID
+        +req.params.serviceID
       );
 
       if (!updatedService) {
@@ -145,16 +141,79 @@ class ServiceController {
     return next();
   };
 
+  static uploadImage = async (
+    req: Request<{}, SuccessResponse<Service>, { serviceID: string }>,
+    res: Response<SuccessResponse<Service>>,
+    next: NextFunction
+  ) => {
+    try {
+      const validated = UploadImageInput.parse(req.body);
+
+      if (!validated) {
+        return null;
+      }
+
+      if (!req.file) {
+        return next(new ErrorResponse(`File is required`, 400));
+      }
+
+      const service = await ServiceHandler.getByID(+req.body.serviceID);
+
+      if (!service) {
+        return next(new ErrorResponse(`Service does not exists`, 404));
+      }
+
+      const previousImageUrl = service.serviceImageUrl;
+      if (previousImageUrl && previousImageUrl !== null) {
+        const imageFile = previousImageUrl.split('/');
+        const imageFileName = imageFile[imageFile.length - 1];
+        const imageFilePath = join(
+          __dirname,
+          '../../../public/service',
+          imageFileName
+        );
+        const tempImageFilePath = join(
+          __dirname,
+          '../../../temp',
+          imageFileName
+        );
+        await copyFile(imageFilePath, tempImageFilePath);
+        await rm(imageFilePath, { maxRetries: 5 });
+      }
+
+      const imageUrl = `http://localhost:4000/service/${req.file.filename}`;
+
+      const data = await ServiceHandler.update(
+        {
+          serviceDiscountPrice: service.serviceDiscountPrice,
+          serviceDurationInMinutes: service.serviceDurationInMinutes,
+          serviceImageUrl: imageUrl,
+          serviceName: service.serviceName,
+          servicePrice: service.servicePrice,
+        },
+        +req.body.serviceID
+      );
+
+      if (!data) {
+        return next(new ErrorResponse(`Service Update was unsuccessful`, 404));
+      }
+
+      res.send(
+        createSuccessResponse(data, 'Service Image Uploaded successfully')
+      );
+    } catch (error) {
+      next(error);
+    }
+
+    return null;
+  };
+
   static delete = async (
     req: Request<DeleteServiceInputParams, SuccessResponse<{}>>,
     res: Response<SuccessResponse<{}>>,
     next: NextFunction
   ) => {
     try {
-      await DeleteServiceInputParams.parseAsync({
-        serviceID: +req.params.serviceID,
-      });
-
       const isDeleted = await ServiceHandler.delete(+req.params.serviceID);
 
       if (isDeleted) {

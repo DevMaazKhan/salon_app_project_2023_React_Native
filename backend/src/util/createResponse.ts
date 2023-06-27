@@ -9,7 +9,7 @@ function createSuccessResponse<T extends {}>(
   message: string
 ): SuccessResponse<T> {
   return {
-    data: { ...data },
+    data,
     message,
     status: 200,
   };

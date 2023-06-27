@@ -44,6 +44,7 @@ model Barber {
   barberName            String    @map("barber_name")
   totalExperienceInYear Int       @map("total_experience_in_years")
   userID                Int       @unique @map("user_id")
+  imageUrl              String    @map("image_url")
   bookings              Booking[]
 
   user User @relation(fields: [userID], references: [userID])
@@ -74,6 +75,15 @@ model Shop {
   @@map("shop")
 }
 
+model Category {
+  categoryID       Int       @id @default(autoincrement()) @map("category_id")
+  categoryName     String    @map("category_name")
+  categoryImageUrl String    @map("category_image_url")
+  services         Service[]
+
+  @@map("category")
+}
+
 model Service {
   serviceID                Int       @id @default(autoincrement()) @map("service_id")
   serviceName              String    @map("service_name")
@@ -84,8 +94,10 @@ model Service {
   hasDiscount              Boolean   @map("has_discount")
   shopID                   Int       @map("shop_id")
   bookings                 Booking[]
+  categoryID               Int       @map("category_id")
 
-  shop Shop @relation(fields: [shopID], references: [shopID])
+  shop     Shop     @relation(fields: [shopID], references: [shopID])
+  category Category @relation(fields: [categoryID], references: [categoryID])
 
   @@map("service")
 }

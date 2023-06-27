@@ -1,7 +1,10 @@
 import { type Request, type Response, type NextFunction } from 'express';
+import { join } from 'path';
+import { copyFile, rm } from 'fs/promises';
 import {
   CreateUserInput,
   LoginUserInput,
+  UploadBarberImageInput,
   User,
   UserWithoutAddress,
 } from './user.model';
@@ -12,8 +15,26 @@ import ErrorResponse from '../../util/createError';
 import Token from '../../util/jwt';
 import config from '../../util/config';
 import userActions from './user.handler';
+import { Barber } from '../barber/barber.model';
+import BarberHandler from '../barber/barber.handler';
 
 class UserController {
+  static getBarbers = async (
+    req: Request,
+    res: Response<SuccessResponse<Barber[]>>,
+    next: NextFunction
+  ) => {
+    try {
+      const barbers = await BarberHandler.get();
+
+      res.send(
+        createSuccessResponse(barbers || [], 'Barbers Created Successfully')
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
   static create = async (
     req: Request<void, SuccessResponse<User>, CreateUserInput | undefined>,
     res: Response<SuccessResponse<User>>,
@@ -84,6 +105,71 @@ class UserController {
     }
 
     return next();
+  };
+
+  static uploadBarberImage = async (
+    req: Request<{}, SuccessResponse<Barber>, UploadBarberImageInput>,
+    res: Response<SuccessResponse<Barber>>,
+    next: NextFunction
+  ) => {
+    try {
+      const validated = UploadBarberImageInput.parse(req.body);
+
+      if (!validated) {
+        return null;
+      }
+
+      if (!req.file) {
+        return next(new ErrorResponse(`File is required`, 400));
+      }
+
+      const barber = await BarberHandler.getByID(+req.body.barberID);
+
+      if (!barber) {
+        return next(new ErrorResponse(`Barber does not exists`, 404));
+      }
+
+      const previousImageUrl = barber.imageUrl;
+      if (previousImageUrl && previousImageUrl !== null) {
+        const imageFile = previousImageUrl.split('/');
+        const imageFileName = imageFile[imageFile.length - 1];
+        const imageFilePath = join(
+          __dirname,
+          '../../../public/barber',
+          imageFileName
+        );
+        const tempImageFilePath = join(
+          __dirname,
+          '../../../temp',
+          imageFileName
+        );
+        await copyFile(imageFilePath, tempImageFilePath);
+        await rm(imageFilePath, { maxRetries: 5 });
+      }
+
+      const imageUrl = `http://localhost:4000/barber/${req.file.filename}`;
+
+      const data = await BarberHandler.update(
+        {
+          barberName: barber.barberName,
+          imageUrl,
+          totalExperienceInYear: barber.totalExperienceInYear,
+        },
+        +req.body.barberID
+      );
+
+      if (!data) {
+        return next(new ErrorResponse(`Barber Update was unsuccessful`, 404));
+      }
+
+      res.send(
+        createSuccessResponse(data, 'Barber Image Uploaded successfully')
+      );
+    } catch (error) {
+      next(error);
+    }
+
+    return null;
   };
 }
 

@@ -10,7 +10,8 @@ class UserService {
       user.userTypeID === USER_TYPE.BARBER_USER
         ? {
             barberName: user.name,
-            totalExperienceInYear: 1,
+            totalExperienceInYear: user.totalExperienceInYear || 0,
+            imageUrl: '',
           }
         : undefined;
     const shop: CreateShopInput | undefined =

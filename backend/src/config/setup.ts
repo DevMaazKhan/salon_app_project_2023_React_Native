@@ -7,4 +7,11 @@ const USER_TYPE = {
   BARBER_USER: 3,
 };
 
-export { USER_TYPE };
+const BOOKING_TYPES = {
+  PENDING: 1,
+  APPROVED: 2,
+  COMPLETED: 3,
+  PAID: 4,
+};
+
+export { USER_TYPE, BOOKING_TYPES };

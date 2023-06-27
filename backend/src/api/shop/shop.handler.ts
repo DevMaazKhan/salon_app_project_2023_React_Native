@@ -8,12 +8,17 @@ class ShopHandler {
     if (validatedShopInput) {
       const newShop = await ShopService.create({
         shopName: validatedShopInput.shopName,
+        userID: 1,
       });
 
       return newShop;
     }
 
     return undefined;
+  };
+
+  static getByID = async (shopID: number): Promise<Shop | null> => {
+    return ShopService.getByID(shopID);
   };
 }
 

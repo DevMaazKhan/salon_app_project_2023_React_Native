@@ -23,6 +23,7 @@ export const CreateUserInput = zod.object({
   email: zod.string(),
   password: zod.string(),
   userTypeID: zod.number(),
+  totalExperienceInYear: zod.number().optional(),
   address: zod.object({
     countryID: zod.number(),
     stateID: zod.number(),
@@ -30,6 +31,10 @@ export const CreateUserInput = zod.object({
     addressLine1: zod.string().nonempty(),
     addressLine2: zod.string().optional(),
   }),
+});
+
+export const UploadBarberImageInput = zod.object({
+  barberID: zod.string(),
 });
 
 export const LoginUserInput = zod.object({
@@ -43,4 +48,5 @@ export type CreateUserInput = zod.infer<typeof CreateUserInput>;
 export type UserWithPassword = UserType;
 export type UserWithoutAddress = Omit<User, 'address' | 'password'>;
 export type LoginUserInput = zod.infer<typeof LoginUserInput>;
+export type UploadBarberImageInput = zod.infer<typeof UploadBarberImageInput>;
 export const Users = db.user;
