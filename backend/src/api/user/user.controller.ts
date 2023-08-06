@@ -49,11 +49,11 @@ class UserController {
         userTypeID: user.userTypeID,
         name: user.name,
         address: {
-          addressLine1: user.address.addressLine1,
-          addressLine2: user.address.addressLine2,
-          cityID: user.address.cityID,
-          countryID: user.address.countryID,
-          stateID: user.address.stateID,
+          addressLine1: user.address?.addressLine1 || '',
+          addressLine2: user.address?.addressLine2 || '',
+          cityID: user.address?.cityID || 1,
+          countryID: user.address?.countryID || 1,
+          stateID: user.address?.stateID || 1,
         },
       });
 
@@ -91,6 +91,8 @@ class UserController {
         config.JWT_ACCESS_TOKEN_PRIVATE_KEY,
         '1y'
       );
+
+      userActions.update(req.body.token, loggedInUser?.userID);
 
       res.cookie('accessToken', accessToken);
 
@@ -147,7 +149,7 @@ class UserController {
         await rm(imageFilePath, { maxRetries: 5 });
       }
 
-      const imageUrl = `http://localhost:4000/barber/${req.file.filename}`;
+      const imageUrl = `http://192.168.100.137:4000/barber/${req.file.filename}`;
 
       const data = await BarberHandler.update(
         {

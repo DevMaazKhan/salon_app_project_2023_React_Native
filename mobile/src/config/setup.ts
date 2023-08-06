@@ -51,6 +51,13 @@ const CONSTANTS = {
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
 };
 
+const BOOKING_TYPES = {
+  PENDING: 1,
+  APPROVED: 2,
+  COMPLETED: 3,
+  PAID: 4,
+};
+
 const ERRORS = {};
 
 const API_ENDPOINTS = {};
@@ -70,4 +77,5 @@ export {
   ASYNC_STORAGE_KEYS,
   NAVIGATION_OPTIONS,
   IMAGE_URL,
+  BOOKING_TYPES,
 };

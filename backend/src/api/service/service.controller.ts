@@ -181,7 +181,7 @@ class ServiceController {
         await rm(imageFilePath, { maxRetries: 5 });
       }
 
-      const imageUrl = `http://localhost:4000/service/${req.file.filename}`;
+      const imageUrl = `http://192.168.100.137:4000/service/${req.file.filename}`;
 
       const data = await ServiceHandler.update(
         {

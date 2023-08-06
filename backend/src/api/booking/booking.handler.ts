@@ -2,8 +2,8 @@ import { Booking, CreateBooking, UpdateBooking } from './booking.model';
 import BookingService from './booking.service';
 
 class BookingHandler {
-  static getAll = async (): Promise<Booking[]> => {
-    return BookingService.getAll();
+  static getAll = async (customerID?: string): Promise<Booking[]> => {
+    return BookingService.getAll(customerID);
   };
 
   static getByID = async (bookingID: number): Promise<Booking | null> => {

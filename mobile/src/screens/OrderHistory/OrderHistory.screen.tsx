@@ -1,4 +1,4 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {
   View,
@@ -11,9 +11,13 @@ import {
   Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import {COLORS, CONSTANTS, FONTS} from '../../config/setup';
+import {BOOKING_TYPES, COLORS, CONSTANTS, FONTS} from '../../config/setup';
 import {useHeaderHeight} from '@react-navigation/elements';
 import {DrawerHeaderProps} from '@react-navigation/drawer';
+import {useUserContext} from '../../hook/useUser';
+import bookingApi from '../../api/booking.api';
+import messaging from '@react-native-firebase/messaging';
+import moment from 'moment';
 
 function CustomHeader(props: DrawerHeaderProps) {
   return (
@@ -42,6 +46,30 @@ function CustomHeader(props: DrawerHeaderProps) {
 function OrderHistoryScreen() {
   const navigation = useNavigation();
   const headerHeight = useHeaderHeight();
+  const {user} = useUserContext();
+  const [bookings, setBookings] = useState([]);
+
+  async function getData() {
+    const {responseData} = await bookingApi.get(
+      user.customer?.customerID || '',
+    );
+
+    setBookings(responseData.data);
+  }
+
+  const unsubscribe = useRef<() => void | undefined>();
+
+  useEffect(() => {
+    unsubscribe.current = messaging().onMessage(() => {
+      getData();
+    });
+
+    return unsubscribe.current;
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -59,6 +87,8 @@ function OrderHistoryScreen() {
     });
   }, [navigation]);
 
+  console.log(bookings[0]);
+
   return (
     <SafeAreaView style={[styles.container]}>
       <ScrollView
@@ -70,13 +100,13 @@ function OrderHistoryScreen() {
           <View style={{marginTop: 20, display: 'flex', flex: 1}}>
             <View style={{flex: 1}}>
               <FlatList
-                data={[{id: 1}, {id: 2}, {id: 3}, {id: 4}]}
+                data={bookings}
                 showsHorizontalScrollIndicator={false}
                 style={{}}
                 scrollEventThrottle={16}
                 snapToAlignment="start"
                 decelerationRate="fast"
-                renderItem={() => (
+                renderItem={({item}) => (
                   <View
                     style={{
                       minWidth: CONSTANTS.windowWidth,
@@ -106,7 +136,7 @@ function OrderHistoryScreen() {
                               color: COLORS.darkColor,
                               includeFontPadding: false,
                             }}>
-                            12 JAN 2018, THU
+                            {item?.bookingSchedule?.BookingDate}
                           </Text>
                           <Text
                             style={{
@@ -116,7 +146,21 @@ function OrderHistoryScreen() {
                               includeFontPadding: false,
                               marginTop: -5,
                             }}>
-                            AT 11:30 AM
+                            AT{' '}
+                            {moment(
+                              item.bookingSchedule?.BookingStartTime,
+                              'hh:mm:ss A',
+                            ).format('hh:mm A')}
+                          </Text>
+                          <Text
+                            style={{
+                              fontFamily: FONTS.BOLD,
+                              fontSize: 12,
+                              color: COLORS.darkColor,
+                              includeFontPadding: false,
+                              marginTop: -5,
+                            }}>
+                            Service: {item.service?.serviceName}
                           </Text>
                         </View>
                         <View>
@@ -127,7 +171,7 @@ function OrderHistoryScreen() {
                               backgroundColor: COLORS.darkColor,
                               borderRadius: 10,
                             }}>
-                            <TouchableOpacity>
+                            <TouchableOpacity activeOpacity={0}>
                               <Text
                                 style={{
                                   color: COLORS.whiteColor,
@@ -136,7 +180,13 @@ function OrderHistoryScreen() {
                                   includeFontPadding: false,
                                   lineHeight: 24,
                                 }}>
-                                Confirm
+                                {item.statusID === BOOKING_TYPES.PENDING
+                                  ? 'PENDING'
+                                  : item.statusID === BOOKING_TYPES.APPROVED
+                                  ? 'Approved'
+                                  : item.statusID === BOOKING_TYPES.COMPLETED
+                                  ? 'Completed'
+                                  : 'Paid'}
                               </Text>
                             </TouchableOpacity>
                           </View>
@@ -160,7 +210,7 @@ function OrderHistoryScreen() {
                             }}>
                             <Image
                               source={{
-                                uri: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8YmFyYmVyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
+                                uri: item?.barber?.imageUrl,
                               }}
                               style={{
                                 width: 50,
@@ -177,7 +227,7 @@ function OrderHistoryScreen() {
                                   fontFamily: FONTS.BOLD,
                                   fontSize: 14,
                                 }}>
-                                John Doe
+                                {item?.barber?.barberName}
                               </Text>
                               <Text
                                 style={{
@@ -186,7 +236,7 @@ function OrderHistoryScreen() {
                                   fontSize: 12,
                                   marginTop: -5,
                                 }}>
-                                123 123 3242
+                                {item?.barber?.phone}
                               </Text>
                             </View>
                           </View>
@@ -198,7 +248,7 @@ function OrderHistoryScreen() {
                               fontSize: 24,
                               color: COLORS.darkColor,
                             }}>
-                            $ 1250.00
+                            Rs. {item?.bookingTotalAmount}
                           </Text>
                         </View>
                       </View>

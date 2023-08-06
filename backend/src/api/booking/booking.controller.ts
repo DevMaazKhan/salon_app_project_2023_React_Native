@@ -4,11 +4,13 @@ import moment from 'moment';
 import createSuccessResponse, {
   SuccessResponse,
 } from '../../util/createResponse';
+import admin from 'firebase-admin';
 import {
   ApproveBooking,
   Booking,
   CreateBooking,
   GetByIDInput,
+  GetByUserID,
 } from './booking.model';
 import BookingHandler from './booking.handler';
 import ErrorResponse from '../../util/createError';
@@ -18,17 +20,25 @@ import BarberHandler from '../barber/barber.handler';
 import CustomerHandler from '../customer/customer.handler';
 import { Service } from '../service/service.model';
 import { BOOKING_TYPES } from '../../config/setup';
+import serviceAccount from '../../../salon-app-935cc-firebase-adminsdk-rvh2u-db2c9f4f69.json' assert { type: 'json' };
+import UserHandler from '../user/user.handler';
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 class BookingController {
   static getAll = async (
-    req: Request<void, SuccessResponse<Booking[]>>,
+    req: Request<GetByUserID, SuccessResponse<Booking[]>>,
     res: Response<SuccessResponse<Booking[]>>,
     next: NextFunction
   ) => {
     try {
-      const services = await BookingHandler.getAll();
+      const { userID } = req.params;
 
-      res.send(createSuccessResponse(services, 'Bookings found Successfully'));
+      const bookings = await BookingHandler.getAll(userID);
+
+      res.send(createSuccessResponse(bookings, 'Bookings found Successfully'));
     } catch (error) {
       next(error);
     }
@@ -74,9 +84,9 @@ class BookingController {
 
       if (booking.serviceID > 0) {
         service = await ServiceHandler.getByID(+booking.serviceID);
-      }
-      if (!service) {
-        return next(new ErrorResponse(`Service does not exists`, 400));
+        if (!service) {
+          return next(new ErrorResponse(`Service does not exists`, 400));
+        }
       }
 
       if (booking.barberID > 0) {
@@ -102,13 +112,13 @@ class BookingController {
       const bookingDate = moment(booking.bookingDate, 'DD-MM-YYYY');
       const currDate = moment();
 
-      if (currDate.isAfter(bookingDate)) {
+      if (bookingDate.isBefore(currDate)) {
         return next(new ErrorResponse(`Booing Date should be in future`, 400));
       }
 
-      booking.bookingEndTime = moment(booking.bookingStartTime, 'HH:mm:ss A')
+      booking.bookingEndTime = moment(booking.bookingStartTime, 'hh:mm:ss A')
         .add(service.serviceDurationInMinutes, 'minutes')
-        .format('HH:mm:ss A');
+        .format('hh:mm:ss A');
 
       const newBooking = await BookingHandler.create(booking);
 
@@ -149,13 +159,24 @@ class BookingController {
         +booking.bookingID
       );
 
+      const user = await UserHandler.getUserByID(newBooking?.customerID);
+
+      admin.messaging().send({
+        notification: {
+          title: 'Order Approved',
+          body: 'Your Order is Approved',
+        },
+        android: {
+          priority: 'high',
+        },
+        token: user.token,
+      });
+
       if (!newBooking) {
         return next(
           new ErrorResponse(`Booking can not be Approved, error ocurred`, 400)
         );
       }
-
-      // Send Notification to Customer, through socket.io
 
       res.send(
         createSuccessResponse(newBooking, 'Booking Approved successfully')
@@ -189,7 +210,18 @@ class BookingController {
         );
       }
 
-      // Send Notification to Customer, through socket.io
+      const user = await UserHandler.getUserByID(newBooking?.customerID);
+
+      admin.messaging().send({
+        notification: {
+          title: 'Order Completed',
+          body: 'Your Order is Completed',
+        },
+        android: {
+          priority: 'high',
+        },
+        token: user.token,
+      });
 
       res.send(
         createSuccessResponse(newBooking, 'Booking Completed successfully')
@@ -222,6 +254,19 @@ class BookingController {
           new ErrorResponse(`Booking can not be Paid, error ocurred`, 400)
         );
       }
+
+      const user = await UserHandler.getUserByID(newBooking?.customerID);
+
+      admin.messaging().send({
+        notification: {
+          title: 'Order Paid',
+          body: 'Your Order is Paid',
+        },
+        android: {
+          priority: 'high',
+        },
+        token: user.token,
+      });
 
       // Send Notification to Customer, through socket.io
 

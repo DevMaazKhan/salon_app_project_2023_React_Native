@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {useHeaderHeight} from '@react-navigation/elements';
 import Logo from '../../assets/images/logo.png';
 import {useNavigation} from '@react-navigation/native';
@@ -16,6 +16,8 @@ import {
 } from 'react-native';
 import {COLORS, CONSTANTS, FONTS} from '../../config/setup';
 import {DrawerHeaderProps} from '@react-navigation/drawer';
+import categoryApi from '../../api/category.apt';
+import barberApi from '../../api/barber.api';
 
 const banners = [
   {
@@ -63,56 +65,56 @@ const barbers = [
   },
 ];
 
-const categories = [
-  {
-    id: '1',
-    name: 'Haircut',
-    image:
-      'https://plus.unsplash.com/premium_photo-1661382022096-d652c06cf1be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-  },
-  {
-    id: '2',
-    name: 'Facial',
-    image:
-      'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZmFjaWFsfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '3',
-    name: 'Massage',
-    image:
-      'https://images.unsplash.com/photo-1542848284-8afa78a08ccb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fE1hc3NhZ2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '4',
-    name: 'Nail',
-    image:
-      'https://plus.unsplash.com/premium_photo-1680348264631-b1205d81e75c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8TmFpbHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '5',
-    name: 'Coloring',
-    image:
-      'https://images.unsplash.com/photo-1587225438173-701d7edc94f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGhhaXIlMjBkeWV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '6',
-    name: 'Beard',
-    image:
-      'https://images.unsplash.com/photo-1517832606299-7ae9b720a186?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGJlYXJkfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '7',
-    name: 'Eye',
-    image:
-      'https://images.unsplash.com/photo-1589710751893-f9a6770ad71b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZXllJTIwbGFzaGVzfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '7',
-    name: 'Eye',
-    image:
-      'https://images.unsplash.com/photo-1589710751893-f9a6770ad71b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZXllJTIwbGFzaGVzfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
-  },
-];
+// const categories = [
+//   {
+//     id: '1',
+//     name: 'Haircut',
+//     image:
+//       'https://plus.unsplash.com/premium_photo-1661382022096-d652c06cf1be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+//   },
+//   {
+//     id: '2',
+//     name: 'Facial',
+//     image:
+//       'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZmFjaWFsfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
+//   },
+//   {
+//     id: '3',
+//     name: 'Massage',
+//     image:
+//       'https://images.unsplash.com/photo-1542848284-8afa78a08ccb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fE1hc3NhZ2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60',
+//   },
+//   {
+//     id: '4',
+//     name: 'Nail',
+//     image:
+//       'https://plus.unsplash.com/premium_photo-1680348264631-b1205d81e75c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8TmFpbHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60',
+//   },
+//   {
+//     id: '5',
+//     name: 'Coloring',
+//     image:
+//       'https://images.unsplash.com/photo-1587225438173-701d7edc94f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGhhaXIlMjBkeWV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60',
+//   },
+//   {
+//     id: '6',
+//     name: 'Beard',
+//     image:
+//       'https://images.unsplash.com/photo-1517832606299-7ae9b720a186?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGJlYXJkfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
+//   },
+//   {
+//     id: '7',
+//     name: 'Eye',
+//     image:
+//       'https://images.unsplash.com/photo-1589710751893-f9a6770ad71b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZXllJTIwbGFzaGVzfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
+//   },
+//   {
+//     id: '7',
+//     name: 'Eye',
+//     image:
+//       'https://images.unsplash.com/photo-1589710751893-f9a6770ad71b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZXllJTIwbGFzaGVzfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
+//   },
+// ];
 
 function CustomHeader(props: DrawerHeaderProps) {
   return (
@@ -139,8 +141,11 @@ function CustomHeader(props: DrawerHeaderProps) {
 function HomeScreen() {
   const [currIndex, setCurrIndex] = useState('0');
   const [bannerIndex, setBannerIndex] = useState('0');
+  const [categories, setCategories] = useState([]);
+  const [barbers, setBarbers] = useState([]);
   const navigation = useNavigation();
   const headerHeight = useHeaderHeight();
+  const [loading, setLoading] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -157,6 +162,22 @@ function HomeScreen() {
       headerShown: true,
     });
   }, [navigation]);
+
+  const getData = async () => {
+    setLoading(true);
+
+    const {responseData} = await categoryApi.getAll();
+    const {responseData: barbersData} = await barberApi.getAll();
+
+    setCategories(responseData.data);
+    setBarbers(barbersData.data);
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container]}>
@@ -241,76 +262,53 @@ function HomeScreen() {
               }}>
               {categories.map((category, i) => (
                 <View
-                  key={category.id}
+                  key={category.categoryID}
                   style={{
                     width: '24.1%',
                     borderRadius: 8,
                     marginLeft: i <= 7 ? 3 : 0,
                   }}>
-                  {i === 7 ? (
-                    <View
+                  <View
+                    style={{
+                      width: '100%',
+                      height: 75,
+                      borderRadius: 8,
+                    }}>
+                    <Image
+                      source={{
+                        uri: category?.categoryImageUrl,
+                      }}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: COLORS.darkColor,
-                        flex: 1,
+                        width: '100%',
+                        height: 75,
                         borderRadius: 8,
-                      }}>
-                      <Text
-                        style={{
-                          color: COLORS.whiteColor,
-                          fontFamily: FONTS.EXTRA_BOLD,
-                          fontSize: CONSTANTS.extraSmallFontSize,
-                          includeFontPadding: false,
-                          lineHeight: CONSTANTS.extraSmallFontLineHeight,
-                        }}>
-                        MORE...
-                      </Text>
-                    </View>
-                  ) : (
+                      }}
+                      resizeMode="cover"
+                    />
                     <View
                       style={{
                         width: '100%',
                         height: 75,
                         borderRadius: 8,
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        padding: 10,
+                        display: 'flex',
+                        justifyContent: 'flex-end',
                       }}>
-                      <Image
-                        source={{
-                          uri: category.image,
-                        }}
+                      <Text
                         style={{
-                          width: '100%',
-                          height: 75,
-                          borderRadius: 8,
-                        }}
-                        resizeMode="cover"
-                      />
-                      <View
-                        style={{
-                          width: '100%',
-                          height: 75,
-                          borderRadius: 8,
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          padding: 10,
-                          display: 'flex',
-                          justifyContent: 'flex-end',
+                          color: COLORS.whiteColor,
+                          fontFamily: FONTS.MEDIUM,
+                          fontSize: 10,
+                          textTransform: 'uppercase',
+                          includeFontPadding: false,
                         }}>
-                        <Text
-                          style={{
-                            color: COLORS.whiteColor,
-                            fontFamily: FONTS.MEDIUM,
-                            fontSize: 10,
-                            textTransform: 'uppercase',
-                            includeFontPadding: false,
-                          }}>
-                          {category.name}
-                        </Text>
-                      </View>
+                        {category.categoryName}
+                      </Text>
                     </View>
-                  )}
+                  </View>
                 </View>
               ))}
             </View>
@@ -377,6 +375,7 @@ function HomeScreen() {
                 style={{
                   marginTop: 10,
                 }}
+                keyExtractor={item => item.barberID}
                 horizontal
                 scrollEventThrottle={16}
                 snapToAlignment="start"
@@ -394,7 +393,7 @@ function HomeScreen() {
                       }}>
                       <Image
                         source={{
-                          uri: barber.image,
+                          uri: barber.imageUrl,
                         }}
                         style={{
                           width: '100%',
@@ -411,7 +410,7 @@ function HomeScreen() {
                             textTransform: 'uppercase',
                             includeFontPadding: false,
                           }}>
-                          {barber.name}
+                          {barber.barberName}
                         </Text>
                         <View style={{display: 'flex', flexDirection: 'row'}}>
                           <Icon
@@ -479,7 +478,7 @@ function HomeScreen() {
                   marginTop: 10,
                   gap: 3,
                 }}>
-                {barbers.map((_, i) => (
+                {[...barbers].slice(0, barbers.length - 1).map((_, i) => (
                   <View
                     style={{
                       width: 5,

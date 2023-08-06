@@ -7,9 +7,11 @@ import config from './util/config';
 import logger from './util/logger';
 import baseRouter from './baseRouter';
 import handleError from './util/handleError';
+import db from './util/db';
 
 const app = express();
 const httpServer: HTTPServer = createServer(app);
+
 const io: SocketIoServer = new SocketIoServer(httpServer, {
   cors: {
     origin: ['http://localhost:5173'],
@@ -30,5 +32,8 @@ app.use('/api/v1', baseRouter);
 app.use(handleError);
 
 httpServer.listen(config.PORT, () => {
+  db.$connect().then(() => {
+    logger.info(`Connected to DB`);
+  });
   logger.info(`Server listening on PORT -> ${config.PORT}`);
 });

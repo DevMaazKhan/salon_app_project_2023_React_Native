@@ -37,10 +37,9 @@ function AuthScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="interactive">
-        <View style={{height: CONSTANTS.windowHeight}}>
+        <View style={{height: '100%'}}>
           <View style={styles.bodyStyles}>
             <View style={styles.bodyTop}>
-              {/* <Text style={styles.logoText}>Logo</Text> */}
               <Image
                 source={Logo}
                 style={{
@@ -52,7 +51,6 @@ function AuthScreen() {
 
             <View style={[styles.bodyBottom, bodyStyles]}>
               <AuthOptions />
-
               <AuthComp />
             </View>
           </View>

@@ -3,6 +3,7 @@ import {View, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {useHeaderHeight} from '@react-navigation/elements';
 import {useNavigation} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/setup';
+import {useUserContext} from '../hook/useUser';
 
 const ITEMS = [
   {
@@ -25,6 +26,7 @@ const ITEMS = [
 function DrawerContent() {
   const navigation = useNavigation();
   const headerHeight = useHeaderHeight();
+  const {user} = useUserContext();
 
   function navigate(navigate: string) {
     navigation.navigate(navigate as never);
@@ -40,7 +42,7 @@ function DrawerContent() {
               fontFamily: FONTS.BOLD,
               fontSize: 16,
             }}>
-            John Doe
+            {user?.name}
           </Text>
           <Text
             style={{
@@ -49,7 +51,7 @@ function DrawerContent() {
               fontSize: 12,
               opacity: 0.6,
             }}>
-            some@some.com
+            {user?.email}
           </Text>
         </View>
       </View>

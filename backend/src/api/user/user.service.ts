@@ -68,7 +68,21 @@ class UserService {
     });
   };
 
-  static getUserByEmail = async (email: string) =>
+  static getUserByID = async (userID: number) =>
+    Users.findFirst({
+      where: { customer: { customerID: userID } },
+      select: {
+        email: true,
+        isVerified: true,
+        password: false,
+        salt: true,
+        userTypeID: true,
+        token: true,
+        userID: true,
+      },
+    });
+
+  static getUserByEmail = async (email: string, userTypeID: number) =>
     Users.findFirst({
       where: { email },
       select: {
@@ -78,6 +92,8 @@ class UserService {
         salt: true,
         userTypeID: true,
         userID: true,
+        customer: userTypeID === USER_TYPE.CUSTOMER_USER,
+        shop: userTypeID === USER_TYPE.SHOP_USER,
       },
     });
 
@@ -91,8 +107,12 @@ class UserService {
         salt: true,
         userTypeID: true,
         userID: true,
+        customer: true,
       },
     });
+
+  static update = async (token: string, userID: number) =>
+    Users.update({ where: { userID }, data: { token } });
 }
 
 export default UserService;

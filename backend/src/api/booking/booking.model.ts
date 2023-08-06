@@ -41,6 +41,9 @@ export const ApproveBooking = zod.object({
   bookingID: zod.string(),
 });
 
+export const GetByUserID = zod.object({
+  userID: zod.string().optional(),
+});
 export const GetByIDInput = zod.object({
   bookingID: zod.string(),
 });
@@ -50,5 +53,6 @@ export type CreateBooking = zod.infer<typeof CreateBooking>;
 export type ApproveBooking = zod.infer<typeof ApproveBooking>;
 export type UpdateBooking = zod.infer<typeof UpdateBooking>;
 export type GetByIDInput = zod.infer<typeof GetByIDInput>;
+export type GetByUserID = zod.infer<typeof GetByUserID>;
 
 export const Bookings = db.booking;

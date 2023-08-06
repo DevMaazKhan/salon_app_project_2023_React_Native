@@ -11,7 +11,7 @@ import Button from "../../../components/Util/Button/Button";
 const formDefaultValues: CreateServiceInput = {
   serviceName: "",
   servicePrice: 0,
-  categoryID: 0,
+  categoryID: 1,
   serviceDiscountPrice: 0,
   serviceDurationInMinutes: 0,
   shopID: 0,

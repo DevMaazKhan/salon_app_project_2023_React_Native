@@ -22,10 +22,10 @@ class CategoryController {
     next: NextFunction
   ) => {
     try {
-      const services = await CategoryHandler.getAll();
+      const categories = await CategoryHandler.getAll();
 
       res.send(
-        createSuccessResponse(services, 'Categories found Successfully')
+        createSuccessResponse(categories, 'Categories found Successfully')
       );
     } catch (error) {
       next(error);
@@ -149,7 +149,7 @@ class CategoryController {
         await rm(imageFilePath, { maxRetries: 5 });
       }
 
-      const imageUrl = `http://localhost:4000/category/${req.file.filename}`;
+      const imageUrl = `http://192.168.100.137:4000/category/${req.file.filename}`;
 
       const data = await CategoryHandler.update(
         {

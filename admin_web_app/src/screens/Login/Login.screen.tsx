@@ -54,6 +54,7 @@ function LoginScreen() {
     loginFunc({
       email: values.email,
       password: values.password,
+      userTypeID: "2",
     });
   }
 

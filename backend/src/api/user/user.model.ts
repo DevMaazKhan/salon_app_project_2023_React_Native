@@ -9,6 +9,7 @@ export const User = zod.object({
   salt: zod.string(),
   isVerified: zod.boolean(),
   userTypeID: zod.number(),
+  name: zod.string(),
   address: zod.object({
     countryID: zod.number(),
     stateID: zod.number(),
@@ -24,13 +25,15 @@ export const CreateUserInput = zod.object({
   password: zod.string(),
   userTypeID: zod.number(),
   totalExperienceInYear: zod.number().optional(),
-  address: zod.object({
-    countryID: zod.number(),
-    stateID: zod.number(),
-    cityID: zod.number(),
-    addressLine1: zod.string().nonempty(),
-    addressLine2: zod.string().optional(),
-  }),
+  address: zod
+    .object({
+      countryID: zod.number(),
+      stateID: zod.number(),
+      cityID: zod.number(),
+      addressLine1: zod.string().nonempty(),
+      addressLine2: zod.string().optional(),
+    })
+    .optional(),
 });
 
 export const UploadBarberImageInput = zod.object({
@@ -40,6 +43,7 @@ export const UploadBarberImageInput = zod.object({
 export const LoginUserInput = zod.object({
   email: zod.string(),
   password: zod.string(),
+  userTypeID: zod.string(),
 });
 
 type UserType = zod.infer<typeof User>;

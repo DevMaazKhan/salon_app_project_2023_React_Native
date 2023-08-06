@@ -1,40 +1,158 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {COLORS, CONSTANTS, FONTS} from '../../../config/setup';
+import {Controller, useForm} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
+import {RegisterFormValidation} from './constant';
+import {authApi} from '../../../api';
 import {AUTH_OPTIONS, AuthContext} from '../Auth.context';
 
 function Register() {
   const {onAuthOptionChange} = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const formMethods = useForm({
+    resolver: yupResolver(RegisterFormValidation),
+    defaultValues: {
+      name: 'maazi',
+      email: 'maaz@maaz.com',
+      confirmPassword: 'some',
+      password: 'some',
+    },
+  });
+
+  const registerUser = async (values: any) => {
+    setLoading(true);
+
+    const {errorMessage, isDone} = await authApi.register(values);
+    setLoading(false);
+
+    if (!isDone) {
+      setError(errorMessage);
+      return;
+    }
+
+    onAuthOptionChange(AUTH_OPTIONS.SIGN_IN)();
+  };
+
+  const onSubmitHandler = async () => {
+    formMethods.handleSubmit(registerUser)();
+  };
 
   return (
     <>
       <View style={styles.authInputs}>
-        <TextInput
-          style={[styles.authInput, styles.authInputMarginBottom]}
-          placeholder="Full Name"
-        />
-        <TextInput
-          style={[styles.authInput, styles.authInputMarginBottom]}
-          placeholder="Email Address"
-        />
-        <TextInput
-          style={[styles.authInput, styles.authInputMarginBottom]}
-          placeholder="Password"
-        />
-        <TextInput style={styles.authInput} placeholder="Confirm Password" />
+        <View style={[styles.authInputMarginBottom]}>
+          <Controller
+            control={formMethods?.control}
+            name="name"
+            render={({field}) => (
+              <TextInput
+                {...field}
+                style={[styles.authInput]}
+                placeholder="Full Name"
+                onChange={e => {
+                  field.onChange(e.nativeEvent.text);
+                }}
+              />
+            )}
+          />
+          <Text style={[styles.error]}>
+            {formMethods.formState.errors.name
+              ? formMethods.formState.errors.name.message
+              : ' '}
+          </Text>
+        </View>
+        <View style={[styles.authInputMarginBottom]}>
+          <Controller
+            control={formMethods?.control}
+            name="email"
+            render={({field}) => (
+              <TextInput
+                {...field}
+                style={[styles.authInput]}
+                placeholder="Email Address"
+                onChange={e => {
+                  field.onChange(e.nativeEvent.text);
+                }}
+              />
+            )}
+          />
+          <Text style={[styles.error]}>
+            {formMethods.formState.errors.email
+              ? formMethods.formState.errors.email.message
+              : ' '}
+          </Text>
+        </View>
+        <View style={[styles.authInputMarginBottom]}>
+          <Controller
+            control={formMethods?.control}
+            name="password"
+            render={({field}) => (
+              <TextInput
+                {...field}
+                style={[styles.authInput]}
+                placeholder="Password"
+                secureTextEntry
+                onChange={e => {
+                  field.onChange(e.nativeEvent.text);
+                }}
+              />
+            )}
+          />
+          <Text style={[styles.error]}>
+            {formMethods.formState.errors.password
+              ? formMethods.formState.errors.password.message
+              : ' '}
+          </Text>
+        </View>
+        <View style={[styles.authInputMarginBottom]}>
+          <Controller
+            control={formMethods?.control}
+            name="confirmPassword"
+            render={({field}) => (
+              <TextInput
+                {...field}
+                style={styles.authInput}
+                placeholder="Confirm Password"
+                secureTextEntry
+                onChange={e => {
+                  field.onChange(e.nativeEvent.text);
+                }}
+              />
+            )}
+          />
+          <Text style={[styles.error]}>
+            {formMethods.formState.errors.confirmPassword
+              ? formMethods.formState.errors.confirmPassword.message
+              : ' '}
+          </Text>
+        </View>
       </View>
 
       <TouchableOpacity
         style={styles.authButtonContainer}
-        onPress={onAuthOptionChange(AUTH_OPTIONS.SIGN_UP)}>
-        <Text style={styles.authButtonText}>SIGN UP</Text>
+        disabled={loading}
+        onPress={onSubmitHandler}>
+        <Text style={styles.authButtonText}>
+          {loading ? <ActivityIndicator /> : 'SIGN UP'}
+        </Text>
       </TouchableOpacity>
+      <Text
+        style={[
+          styles.error,
+          {textAlign: 'center', marginTop: 4, marginLeft: 0},
+        ]}>
+        {error ? error : ' '}
+      </Text>
 
       <View style={styles.bottomLineContainer}>
         <Text style={styles.bottomLineText1}>
@@ -48,7 +166,7 @@ function Register() {
 
 const styles = StyleSheet.create({
   authInputs: {
-    marginTop: 70,
+    marginTop: 40,
   },
 
   authInput: {
@@ -63,10 +181,10 @@ const styles = StyleSheet.create({
   },
 
   authInputMarginBottom: {
-    marginBottom: 25,
+    marginBottom: 10,
   },
 
-  authButtonContainer: {display: 'flex', alignItems: 'center', marginTop: 40},
+  authButtonContainer: {display: 'flex', alignItems: 'center', marginTop: 20},
   authButtonText: {
     padding: 14,
     paddingHorizontal: 60,
@@ -85,6 +203,13 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     textDecorationColor: COLORS.whiteColor,
     textDecorationStyle: 'solid',
+  },
+
+  error: {
+    color: COLORS.errorColor,
+    fontFamily: FONTS.MEDIUM,
+    fontSize: 10,
+    marginLeft: 20,
   },
 });
 

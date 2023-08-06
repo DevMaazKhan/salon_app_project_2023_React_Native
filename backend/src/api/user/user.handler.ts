@@ -19,7 +19,13 @@ class UserHandler {
       salt,
       userTypeID: user.userTypeID,
       isVerified: true,
-      address: user.address,
+      address: user.address || {
+        addressLine1: '',
+        addressLine2: '',
+        cityID: 1,
+        countryID: 1,
+        stateID: 1,
+      },
     });
 
     // switch (user.userTypeID) {
@@ -39,15 +45,62 @@ class UserHandler {
     //     break;
     // }
 
-    return newUser as User;
+    return {
+      ...newUser,
+      email: newUser?.email || '',
+      userTypeID: newUser?.userTypeID || 0,
+      salt: newUser?.salt || '',
+      isVerified: newUser?.isVerified || false,
+      name: newUser?.customer ? newUser.customer.customerName : '',
+      address: newUser.address
+        ? newUser.address
+        : {
+            addressLine1: '',
+            addressLine2: '',
+            cityID: 1,
+            countryID: 1,
+            stateID: 1,
+          },
+    };
   };
 
   static getUserByEmail = async (
-    email: string
+    email: string,
+    userTypeID: number
   ): Promise<UserWithoutAddress | null> => {
-    const newUser = await UserService.getUserByEmail(email);
+    const newUser = await UserService.getUserByEmail(email, userTypeID);
 
-    return newUser;
+    if (!newUser) {
+      return null;
+    }
+
+    return {
+      ...newUser,
+      email: newUser?.email || '',
+      userTypeID: newUser?.userTypeID || 0,
+      salt: newUser?.salt || '',
+      isVerified: newUser?.isVerified || false,
+      name: newUser?.customer ? newUser.customer.customerName : '',
+    };
+  };
+
+  static getUserByID = async (
+    userID: number
+  ): Promise<UserWithoutAddress | null> => {
+    const newUser = await UserService.getUserByID(userID);
+
+    if (!newUser) {
+      return null;
+    }
+
+    return {
+      ...newUser,
+      email: newUser?.email || '',
+      userTypeID: newUser?.userTypeID || 0,
+      salt: newUser?.salt || '',
+      isVerified: newUser?.isVerified || false,
+      name: '',
+    };
   };
 
   static getUserByPasswordAndEmail = async (
@@ -59,13 +112,32 @@ class UserHandler {
       password
     );
 
-    return newUser;
+    return {
+      ...newUser,
+      email: newUser?.email || '',
+      userTypeID: newUser?.userTypeID || 0,
+      salt: newUser?.salt || '',
+      isVerified: newUser?.isVerified || false,
+      name: newUser?.customer ? newUser.customer.customerName : '',
+    };
+  };
+
+  static update = async (
+    token: string,
+    userID: number
+  ): Promise<UserWithoutAddress | null> => {
+    UserService.update(token, userID);
+
+    return null;
   };
 
   static login = async (
     user: LoginUserInput
   ): Promise<UserWithoutAddress | null> => {
-    const emailMatchedUser = await this.getUserByEmail(user.email);
+    const emailMatchedUser = await this.getUserByEmail(
+      user.email,
+      +user.userTypeID
+    );
 
     if (!emailMatchedUser) {
       throw new ErrorResponse('Email or Password is Incorrect', 400);

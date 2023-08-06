@@ -14,6 +14,7 @@ model User {
   salt       String    @map("user_salt")
   isVerified Boolean   @map("is_verified")
   userTypeID Int       @map("user_type_id")
+  token      String?
   address    Address?
   customer   Customer?
   shop       Shop?

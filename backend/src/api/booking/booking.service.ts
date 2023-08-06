@@ -7,8 +7,11 @@ import {
 } from './booking.model';
 
 class BookingService {
-  static getAll = (): Promise<Booking[]> => {
+  static getAll = (customerID?: string): Promise<Booking[]> => {
     return Bookings.findMany({
+      where: {
+        customerID: customerID ? +customerID : undefined,
+      },
       include: {
         bookingSchedule: true,
         customer: true,

@@ -33,7 +33,7 @@ export interface CreateUserInput {
   address: CreateUserInputAddress;
 }
 
-function login(data: { email: string; password: string }) {
+function login(data: { email: string; password: string; userTypeID: string }) {
   return axiosInstance.post("/user/login", data);
 }
 
