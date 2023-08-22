@@ -8,10 +8,13 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {COLORS, CONSTANTS, FONTS} from '../../config/setup';
+import {COLORS, CONSTANTS, FONTS, NAVIGATION_OPTIONS} from '../../config/setup';
+import {useNavigation} from '@react-navigation/native';
 
 function ThanksOrderScreen() {
   const headerHeight = useHeaderHeight();
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView style={[styles.container]}>
       <ScrollView
@@ -54,7 +57,10 @@ function ThanksOrderScreen() {
                 padding: 10,
                 borderRadius: 10,
               }}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('OrderNavigation');
+                }}>
                 <Text
                   style={{
                     textAlign: 'center',

@@ -28,9 +28,12 @@ const login = async (data: any) => {
       ...data,
       userTypeID: '1',
     });
+
     responseData = res.data;
     isDone = true;
   } catch (error: any) {
+    console.log(error);
+
     errorMessage = error.response.data?.message || '';
   } finally {
     return {responseData, isDone, errorMessage};

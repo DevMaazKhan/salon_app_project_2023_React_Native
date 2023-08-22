@@ -87,8 +87,6 @@ function OrderHistoryScreen() {
     });
   }, [navigation]);
 
-  console.log(bookings[0]);
-
   return (
     <SafeAreaView style={[styles.container]}>
       <ScrollView
