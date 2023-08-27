@@ -17,6 +17,7 @@ import config from '../../util/config';
 import userActions from './user.handler';
 import { Barber } from '../barber/barber.model';
 import BarberHandler from '../barber/barber.handler';
+import { SETUP } from '../../config/setup';
 
 class UserController {
   static getBarbers = async (
@@ -41,6 +42,8 @@ class UserController {
     next: NextFunction
   ) => {
     try {
+      console.log(req.body);
+
       const user = CreateUserInput.parse(req.body ?? {});
 
       const newUser = await userActions.create({
@@ -74,6 +77,7 @@ class UserController {
   ) => {
     try {
       const user = LoginUserInput.parse(req.body ?? {});
+      console.log(user);
 
       const loggedInUser = await userActions.login(user);
 
@@ -149,7 +153,7 @@ class UserController {
         await rm(imageFilePath, { maxRetries: 5 });
       }
 
-      const imageUrl = `http://192.168.100.137:4000/barber/${req.file.filename}`;
+      const imageUrl = `${SETUP.API_KEY}/barber/${req.file.filename}`;
 
       const data = await BarberHandler.update(
         {

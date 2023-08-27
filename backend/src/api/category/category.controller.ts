@@ -14,6 +14,7 @@ import {
 } from './category.model';
 import ErrorResponse from '../../util/createError';
 import CategoryHandler from './category.handler';
+import { SETUP } from '../../config/setup';
 
 class CategoryController {
   static getAll = async (
@@ -149,7 +150,7 @@ class CategoryController {
         await rm(imageFilePath, { maxRetries: 5 });
       }
 
-      const imageUrl = `http://192.168.100.137:4000/category/${req.file.filename}`;
+      const imageUrl = `${SETUP.API_KEY}/category/${req.file.filename}`;
 
       const data = await CategoryHandler.update(
         {

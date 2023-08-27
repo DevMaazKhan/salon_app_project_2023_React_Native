@@ -7,6 +7,10 @@ const USER_TYPE = {
   BARBER_USER: 3,
 };
 
+const SETUP = {
+  API_KEY: '',
+};
+
 const BOOKING_TYPES = {
   PENDING: 1,
   APPROVED: 2,
@@ -14,4 +18,4 @@ const BOOKING_TYPES = {
   PAID: 4,
 };
 
-export { USER_TYPE, BOOKING_TYPES };
+export { USER_TYPE, SETUP, BOOKING_TYPES };

@@ -17,6 +17,7 @@ import ErrorResponse from '../../util/createError';
 import ServiceHandler from './service.handler';
 import CategoryHandler from '../category/category.handler';
 import ShopHandler from '../shop/shop.handler';
+import { SETUP } from '../../config/setup';
 
 class ServiceController {
   static getAll = async (
@@ -181,7 +182,7 @@ class ServiceController {
         await rm(imageFilePath, { maxRetries: 5 });
       }
 
-      const imageUrl = `http://192.168.100.137:4000/service/${req.file.filename}`;
+      const imageUrl = `${SETUP.API_KEY}/service/${req.file.filename}`;
 
       const data = await ServiceHandler.update(
         {
