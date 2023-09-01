@@ -9,6 +9,7 @@ const register = async (data: any) => {
       ...data,
       userTypeID: 1,
     });
+
     responseData = res.data;
     isDone = true;
   } catch (error: any) {

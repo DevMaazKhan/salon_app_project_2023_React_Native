@@ -106,7 +106,7 @@ function BookingScreen() {
 
     let tempSlots = [];
 
-    let lastTime = moment('07 PM', 'hh A');
+    let lastTime = moment('11:59 PM', 'hh A');
     let openTime = moment('09 AM', 'hh A');
 
     currDate = moment();

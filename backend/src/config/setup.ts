@@ -8,7 +8,7 @@ const USER_TYPE = {
 };
 
 const SETUP = {
-  API_KEY: '',
+  API_KEY: 'http://192.168.100.137:4000',
 };
 
 const BOOKING_TYPES = {

@@ -27,7 +27,7 @@ class ServiceService {
           connect: { categoryID: service.categoryID },
         },
         shop: {
-          connect: { userID: service.shopID },
+          connect: { shopID: service.shopID },
         },
       },
     });

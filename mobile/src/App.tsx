@@ -1,10 +1,11 @@
 import 'react-native-gesture-handler';
 import React, {useEffect, useRef} from 'react';
-import {StatusBar} from 'react-native';
+import {StatusBar, TouchableOpacity, Text} from 'react-native';
 import {COLORS} from './config/setup';
 import {NavigationContainer} from '@react-navigation/native';
 import MainNavigation from './navigations/MainNavigation';
 import UserContextProvider from './context/UserContext';
+import SplashScreen from 'react-native-splash-screen';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification, {Importance} from 'react-native-push-notification';
 
@@ -46,6 +47,8 @@ function App() {
       createChannel(channelID);
       showNotification(channelID, {...message.notification});
     });
+
+    SplashScreen.hide();
 
     return unsubscribe.current;
   }, []);

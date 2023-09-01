@@ -77,7 +77,6 @@ class UserController {
   ) => {
     try {
       const user = LoginUserInput.parse(req.body ?? {});
-      console.log(user);
 
       const loggedInUser = await userActions.login(user);
 

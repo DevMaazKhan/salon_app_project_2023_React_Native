@@ -38,8 +38,8 @@ function Login() {
   const formMethods = useForm({
     resolver: yupResolver(LoginFormValidation),
     defaultValues: {
-      email: 'maaz@maaz.com',
-      password: 'some',
+      email: '',
+      password: '',
     },
   });
 

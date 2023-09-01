@@ -11,7 +11,7 @@ import Button from "../../../components/Util/Button/Button";
 const formDefaultValues: CreateServiceInput = {
   serviceName: "",
   servicePrice: 0,
-  categoryID: 1,
+  categoryID: 0,
   serviceDiscountPrice: 0,
   serviceDurationInMinutes: 0,
   shopID: 0,
@@ -91,6 +91,7 @@ function CreateEditService() {
                     onBlur={field.onBlur}
                     className="w-full block text-sm rounded-md p-2 border-2 shadow-sm border-b-dark-200 border-opacity-30 border-b-4 bg-white outline-none transition-all duration-200 focus:border-b-dark focus:border-b-4 focus:outline-none"
                   >
+                    <option value="0">Select Category</option>
                     {categories?.data.data.map((category) => (
                       <option value={category.categoryID}>{category.categoryName}</option>
                     ))}

@@ -153,7 +153,7 @@ class UserHandler {
       hashedPassword
     );
 
-    if (!emailAndPasswordMatchedUser) {
+    if (!emailAndPasswordMatchedUser || !emailAndPasswordMatchedUser.userID) {
       throw new ErrorResponse('Email or Password is Incorrect', 400);
     }
 

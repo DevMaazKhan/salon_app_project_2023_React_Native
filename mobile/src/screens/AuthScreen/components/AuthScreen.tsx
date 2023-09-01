@@ -1,14 +1,23 @@
 import React, {useContext, useMemo} from 'react';
 import Logo from '../../../assets/images/logo.png';
-import {View, SafeAreaView, StyleSheet, ScrollView, Image} from 'react-native';
+import {
+  View,
+  SafeAreaView,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import AuthOptions from './AuthOptions';
 import {COLORS, CONSTANTS, FONTS} from '../../../config/setup';
 import Register from './Register';
 import {AUTH_OPTIONS, AuthContext} from '../Auth.context';
 import Login from './Login';
+import {useNavigation} from '@react-navigation/native';
 
 function AuthScreen() {
   const {authOption} = useContext(AuthContext);
+  const navigation = useNavigation();
 
   const AuthComp = useMemo(
     () => (authOption === AUTH_OPTIONS.SIGN_IN ? Login : Register),
@@ -40,6 +49,22 @@ function AuthScreen() {
         <View style={{height: '100%'}}>
           <View style={styles.bodyStyles}>
             <View style={styles.bodyTop}>
+              <TouchableOpacity
+                style={{
+                  width: 30,
+                  height: 30,
+                  position: 'absolute',
+                  top: 60,
+                  left: 0,
+                  zIndex: 1000,
+                  backgroundColor: '#ccc',
+                  opacity: 0.1,
+                  borderRadius: 30,
+                }}
+                onPress={() => {
+                  navigation.navigate('General');
+                }}
+              />
               <Image
                 source={Logo}
                 style={{

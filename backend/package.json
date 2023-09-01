@@ -26,12 +26,12 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
-    "prisma": "^4.14.1",
+    "prisma": "^5.2.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@prisma/client": "^4.14.1",
+    "@prisma/client": "^5.2.0",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "env-schema": "^5.2.0",

@@ -22,10 +22,10 @@ function Register() {
   const formMethods = useForm({
     resolver: yupResolver(RegisterFormValidation),
     defaultValues: {
-      name: 'maazi',
-      email: 'maaz@maaz.com',
-      confirmPassword: 'some',
-      password: 'some',
+      name: '',
+      email: '',
+      confirmPassword: '',
+      password: '',
     },
   });
 
